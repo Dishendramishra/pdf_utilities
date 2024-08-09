@@ -104,9 +104,10 @@ class MainWindow(QMainWindow):
     def clear(self):
         self.txt_edit.clear()
 
-app = QApplication(sys.argv)
-app.setStyle("Fusion")
-window = MainWindow()
-window.show()
-app.exec()
-sys.exit()
+if __name__ == "__main__":    
+    app = QApplication(sys.argv)
+    app.setStyle("Fusion")
+    window = MainWindow()
+    window.show()
+    app.exec()
+    sys.exit()
