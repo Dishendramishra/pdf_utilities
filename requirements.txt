@@ -1,3 +1,0 @@
-pypdf2
-pdf2docx
-pyside6

@@ -31,26 +31,31 @@ class MainWindow(QMainWindow):
         self.btn_select = QPushButton("Select Files")
         self.btn_select.clicked.connect(self.selectFiles)
         
+        self.txt_edit = QTextEdit()
+        self.txt_edit.setReadOnly(True)
+
         self.btn_merge = QPushButton("Merge Files")
         self.btn_merge.clicked.connect(self.start_merge_pdf_thread)
         
         self.btn_convert = QPushButton("Convert")
         self.btn_convert.clicked.connect(self.convert_pdf_thread)
         
-        self.txt_edit = QTextEdit()
-        self.txt_edit.setReadOnly(True)
+        self.btn_ocr = QPushButton("OCR")
+        self.btn_ocr.clicked.connect(self.start_ocr_thread)
         
         self.layout.addWidget(self.btn_select,0,0,1,2)
         self.layout.addWidget(self.txt_edit,1,0,1,2)
         self.layout.addWidget(self.btn_merge,2,0)
         self.layout.addWidget(self.btn_convert,2,1)
+        self.layout.addWidget(self.btn_ocr,3,0)
 
+        self.btn_ocr.setDisabled(True)
         self.btn_convert.setDisabled(True)
         self.btn_merge.setDisabled(True)
         
-        widget = QWidget()
-        widget.setLayout(self.layout)
-        self.setCentralWidget(widget)
+        self.central_widget = QWidget()
+        self.central_widget.setLayout(self.layout)
+        self.setCentralWidget(self.central_widget)
 
         self.list_selected_files = None
 
@@ -79,6 +84,7 @@ class MainWindow(QMainWindow):
             if len(self.list_selected_files) > 1:
                 self.btn_merge.setDisabled(False)
             self.btn_convert.setDisabled(False)
+            self.btn_ocr.setDisabled(False)
 
     def start_merge_pdf_thread(self): 
         self.btn_merge.setDisabled(True)
@@ -100,6 +106,49 @@ class MainWindow(QMainWindow):
         self.thread = pdf_utils.pdfToDocxThread(self.list_selected_files)
         self.thread.msg.connect(self.log)
         self.thread.start()
+
+    def start_ocr_thread(self):
+        self.btn_convert.setDisabled(True)
+        self.btn_ocr.setDisabled(True)
+        self.thread = pdf_utils.ocrPdfThread(self.list_selected_files)
+        self.thread.msg.connect(self.log)
+        self.thread.thread_finished.connect(self.done_ocr_thread)
+        self.thread.start()        
+        self.hide()
+        self.loading_screen()
+
+    def done_ocr_thread(self):
+        self.loading_screen_window.close()
+        self.show()
+        self.btn_convert.setDisabled(False)
+        self.btn_ocr.setDisabled(False)
+        self.log("OCR task(s) completed!")
+
+    def loading_screen(self):
+        self.loading_screen_window = QWidget()
+        self.loading_screen_window.setWindowIcon(QIcon("resources/icon.png"))
+        self.loading_screen_window.setWindowTitle("Processing")
+        self.loading_screen_window.setStyleSheet("background-color: white;")
+        self.loading_screenlayout = QVBoxLayout()
+        self.loading_screen_label = QLabel()
+        self.loading_screen_label.setGeometry(QRect(25, 25, 200, 200)) 
+        self.loading_screen_label.setMinimumSize(QSize(250, 250)) 
+        self.loading_screen_label.setMaximumSize(QSize(250, 250)) 
+        self.loading_screenlayout.addWidget(self.loading_screen_label)
+        movie = QMovie("resources/loading.gif")
+        self.loading_screen_label.setMovie(movie)
+        self.loading_screen_label.setScaledContents(True)
+        movie.start()
+        self.loading_screen_window.setLayout(self.loading_screenlayout)
+        self.loading_screen_window.show()
+        self.loading_screen_window.exec()
+        self.disable_all()
+
+    def disable_all(self):
+        self.btn_merge.setDisabled(True)
+        self.btn_convert.setDisabled(True)
+        self.btn_ocr.setDisabled(True)
+        self.btn_select.setDisabled(True)
 
     def clear(self):
         self.txt_edit.clear()

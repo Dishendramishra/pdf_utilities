@@ -3,6 +3,7 @@ from pdf2docx import Converter
 from pdf2docx import parse
 import os
 import time
+import ocrmypdf
 
 from PySide6.QtWidgets import *
 from PySide6.QtCore import *
@@ -55,7 +56,31 @@ class pdfToDocxThread(QThread):
                 parse(i, i+".docx", start=0, end=None)
         
         self.msg.emit("Conversion Completed!","blue")
-            
+
+# class loadingAnimationThread(QThread):
+
+#     def __init__(self):
+#         super().__init__()
+
+#     def run(self):
+
+
+class ocrPdfThread(QThread):
+    msg = Signal(str,str)
+    thread_finished = Signal(int)
+
+    def __init__(self, list_of_files):
+        super().__init__()
+        self.list_of_files = list_of_files
+    
+    def run(self):
+        for file in self.list_of_files:
+            suffix = str(int(time.time()))
+            output_file = file.replace(".", "_"+suffix+"_ocr.")
+
+            ocrmypdf.ocr(file, output_file, language=["eng","hin"])
+            self.msg.emit(f"OCR Completed for {file}", "blue")
+        self.thread_finished.emit(1)
 
 def pdfToDocx(list_pdfs):
     if len(list_pdfs) > 0:
