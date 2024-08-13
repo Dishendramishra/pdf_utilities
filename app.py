@@ -97,10 +97,14 @@ class MainWindow(QMainWindow):
             self.thread.log.connect(self.log)
             self.thread.thread_finished.connect(self.done_merge_pdf_thread)
             self.thread.start()
+            self.hide()
+            self.loading_screen()
     
     def done_merge_pdf_thread(self):
         self.btn_merge.setDisabled(False)
         self.btn_convert.setDisabled(False)
+        self.loading_screen_window.close()
+        self.show()
 
     def convert_pdf_thread(self):
         self.thread = pdf_utils.pdfToDocxThread(self.list_selected_files)
