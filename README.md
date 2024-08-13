@@ -13,3 +13,12 @@ Python 3.12
 ### Demo
 
 ![](./demo.gif)
+
+
+---
+
+### ocrmypdf command
+
+```bash
+ocrmypdf --rotate-pages --output-type pdf --force-ocr -l eng+hin <inpfile_name> <outfile_name>
+```
