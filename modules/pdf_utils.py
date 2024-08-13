@@ -57,14 +57,6 @@ class pdfToDocxThread(QThread):
         
         self.msg.emit("Conversion Completed!","blue")
 
-# class loadingAnimationThread(QThread):
-
-#     def __init__(self):
-#         super().__init__()
-
-#     def run(self):
-
-
 class ocrPdfThread(QThread):
     msg = Signal(str,str)
     thread_finished = Signal(int)
