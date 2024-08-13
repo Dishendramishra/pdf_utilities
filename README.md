@@ -10,10 +10,16 @@ Python 3.12
 
 [tesseract v5.4.X](https://github.com/UB-Mannheim/tesseract/releases/download/v5.4.0.20240606/tesseract-ocr-w64-setup-5.4.0.20240606.exe)
 
+
+**For python dependencies**
+
+```bash
+pip install -r requirements.txt
+```
+
 ### Demo
 
 ![](./demo.gif)
-
 
 ---
 
